@@ -29,9 +29,41 @@ class Song
     self.id = DB[:conn].execute("SELECT last_insert_rowid() FROM songs")[0][0]
     self
   end
-  
+
   def self.create(name:, album:)
     song = Song.new(name: name, album: album)
     song.save
   end
+
+  def self.new_from_db(row)
+    self.new(name: row[1], album:row[2], id:row[0])
+  end
+
+  def self.all
+    sql = <<-SQL 
+      SELECT *
+      FROM songs
+    SQL
+    DB[:conn].execute(sql).map do |row|
+      self.new_from_db(row)
+    end
+    
+  end
+
+  def self.find_by_name(name)
+    sql = <<-SQL
+      SELECT *
+      FROM songs
+      WHERE name = ?
+      LIMIT 1
+    SQL
+    #Don't be freaked out by that #first method chained to the end of the DB[:conn].execute(sql, name).map block. 
+    #The return value of the #map method is an array, and we're simply grabbing the #first element from the returned array. 
+    #Chaining is cool!
+
+
+    DB[:conn].execute(sql, name).map do |row|
+      self.new_from_db(row)
+    end.first
+  end    
 end

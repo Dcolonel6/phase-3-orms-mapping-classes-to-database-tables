@@ -3,6 +3,16 @@
 require 'pry'
 require_relative '../config/environment'
 
+def reset_database
+   # Song.drop_table
+    Song.create_table
+    Song.create(name: "Hello", album: "25")
+    Song.create(name: "99 Problems", album: "The Black Album")
+end
+  
+reset_database
+  
+
 binding.pry
 "pls"
 #In this file, we're requiring in the environment.rb 
